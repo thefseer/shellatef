@@ -1,163 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>shellatef</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+  const original = document.getElementById("originalText");
+  const converted = document.getElementById("convertedText");
 
-  <style>
-    body {
-      font-family: "Myriad Pro", Myriad, "Segoe UI", Calibri, Arial, sans-serif;
-      background: #f5f5f5;
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      color: #222;
+  let active = null;
+
+  const enToZh = {
+    A: "阿", B: "贝", C: "西", D: "迪", E: "伊", F: "艾弗",
+    G: "吉", H: "艾尺", I: "艾", J: "杰", K: "凯", L: "艾勒",
+    M: "艾姆", N: "艾恩", O: "哦", P: "屁", Q: "吉吾",
+    R: "艾儿", S: "艾丝", T: "提", U: "伊吾", V: "维",
+    W: "达布流", X: "艾克斯", Y: "吾艾", Z: "贼德"
+  };
+
+  const zhToEn = Object.fromEntries(
+    Object.entries(enToZh).map(([k, v]) => [v, k])
+  );
+
+  original.addEventListener("input", () => {
+    if (active === "converted") return;
+    active = "original";
+    converted.value = toChinese(original.value);
+    active = null;
+  });
+
+  converted.addEventListener("input", () => {
+    if (active === "original") return;
+    active = "converted";
+    original.value = toEnglish(converted.value);
+    active = null;
+  });
+
+  function toChinese(text) {
+    return text.split("").map(c => {
+      const up = c.toUpperCase();
+      return enToZh[up] ? enToZh[up] : c;
+    }).join("");
+  }
+
+  function toEnglish(text) {
+    let result = text;
+    for (const [zh, en] of Object.entries(zhToEn)) {
+      result = result.split(zh).join(en);
     }
-
-    .app {
-      width: 100%;
-      max-width: 720px;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-
-    h1 {
-      text-align: center;
-      margin: 12px 0 24px;
-      font-size: 34px;
-      font-weight: 700;
-      letter-spacing: 1px;
-    }
-
-    .card {
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 18px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
-    }
-
-    .hero-img {
-      width: 100%;
-      max-height: 320px;
-      object-fit: cover;
-      border-radius: 10px;
-      margin-bottom: 18px;
-      filter: grayscale(100%);
-      opacity: 0.4;
-    }
-
-    .boxes {
-      display: flex;
-      gap: 16px;
-    }
-
-    .box {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    h3 {
-      margin: 0 0 8px;
-      font-size: 15px;
-    }
-
-    textarea {
-      flex: 1;
-      min-height: 140px;
-      padding: 12px;
-      font-size: 16px;
-      font-family: inherit;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      resize: none;
-    }
-
-    .footer {
-      margin-top: 12px;
-      font-size: 12px;
-      color: #777;
-      text-align: right;
-    }
-
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 26px;
-      }
-
-      .hero-img {
-        max-height: 220px;
-      }
-
-      .boxes {
-        flex-direction: column;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <div class="app">
-    <h1>♥ shellatef ♥</h1>
-
-    <div class="card">
-      <img src="IMG_9532.JPEG" alt="shellatef image" class="hero-img">
-
-      <div class="boxes">
-        <div class="box">
-          <h3>Original Text</h3>
-          <textarea id="originalText" placeholder="Type here..."></textarea>
-        </div>
-
-        <div class="box">
-          <h3>Converted Text</h3>
-          <textarea id="convertedText" placeholder="Type here..."></textarea>
-        </div>
-      </div>
-
-      <div class="footer">©Thefseer</div>
-    </div>
-  </div>
-
-  <script>
-    const original = document.getElementById("originalText");
-    const converted = document.getElementById("convertedText");
-
-    let active = null;
-
-    original.addEventListener("input", () => {
-      if (active === "converted") return;
-      active = "original";
-      converted.value = shiftBackward(original.value);
-      active = null;
-    });
-
-    converted.addEventListener("input", () => {
-      if (active === "original") return;
-      active = "converted";
-      original.value = shiftForward(converted.value);
-      active = null;
-    });
-
-    function shiftBackward(text) {
-      return text.split("").map(c => {
-        if (c >= "A" && c <= "Z") return c === "A" ? "Z" : String.fromCharCode(c.charCodeAt(0) - 1);
-        if (c >= "a" && c <= "z") return c === "a" ? "z" : String.fromCharCode(c.charCodeAt(0) - 1);
-        return c;
-      }).join("");
-    }
-
-    function shiftForward(text) {
-      return text.split("").map(c => {
-        if (c >= "A" && c <= "Z") return c === "Z" ? "A" : String.fromCharCode(c.charCodeAt(0) + 1);
-        if (c >= "a" && c <= "z") return c === "z" ? "a" : String.fromCharCode(c.charCodeAt(0) + 1);
-        return c;
-      }).join("");
-    }
-  </script>
-
-</body>
-</html>
+    return result;
+  }
+</script>
