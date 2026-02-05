@@ -39,7 +39,6 @@
       box-shadow: 0 6px 16px rgba(0,0,0,0.08);
     }
 
-    /* Image styling */
     .hero-img {
       width: 100%;
       max-height: 320px;
@@ -47,7 +46,7 @@
       border-radius: 10px;
       margin-bottom: 18px;
       filter: grayscale(100%);
-      opacity: 0.4; /* 40% fade */
+      opacity: 0.4;
     }
 
     .boxes {
@@ -84,7 +83,6 @@
       text-align: right;
     }
 
-    /* Mobile */
     @media (max-width: 600px) {
       h1 {
         font-size: 26px;
@@ -110,13 +108,13 @@
 
       <div class="boxes">
         <div class="box">
-          <h3>Original Text</h3>
-          <textarea id="inputText" placeholder="Type here..."></textarea>
+          <h3>Original Text (A → Z)</h3>
+          <textarea id="originalText" placeholder="Type here..."></textarea>
         </div>
 
         <div class="box">
-          <h3>Converted Text</h3>
-          <textarea id="outputText" readonly></textarea>
+          <h3>Converted Text (Z → A)</h3>
+          <textarea id="convertedText" placeholder="Type here..."></textarea>
         </div>
       </div>
 
@@ -125,22 +123,48 @@
   </div>
 
   <script>
-    const inputText = document.getElementById("inputText");
-    const outputText = document.getElementById("outputText");
+    const original = document.getElementById("originalText");
+    const converted = document.getElementById("convertedText");
 
-    inputText.addEventListener("input", () => {
-      outputText.value = convertText(inputText.value);
+    let isTyping = null;
+
+    original.addEventListener("input", () => {
+      if (isTyping === "converted") return;
+      isTyping = "original";
+      converted.value = shiftBackward(original.value);
+      isTyping = null;
     });
 
-    function convertText(text) {
-      return text.split("").map(char => {
-        if (char >= "A" && char <= "Z") {
-          return char === "A" ? "Z" : String.fromCharCode(char.charCodeAt(0) - 1);
+    converted.addEventListener("input", () => {
+      if (isTyping === "original") return;
+      isTyping = "converted";
+      original.value = shiftForward(converted.value);
+      isTyping = null;
+    });
+
+    // A → Z, B → A
+    function shiftBackward(text) {
+      return text.split("").map(c => {
+        if (c >= "A" && c <= "Z") {
+          return c === "A" ? "Z" : String.fromCharCode(c.charCodeAt(0) - 1);
         }
-        if (char >= "a" && char <= "z") {
-          return char === "a" ? "z" : String.fromCharCode(char.charCodeAt(0) - 1);
+        if (c >= "a" && c <= "z") {
+          return c === "a" ? "z" : String.fromCharCode(c.charCodeAt(0) - 1);
         }
-        return char;
+        return c;
+      }).join("");
+    }
+
+    // Z → A, A → B
+    function shiftForward(text) {
+      return text.split("").map(c => {
+        if (c >= "A" && c <= "Z") {
+          return c === "Z" ? "A" : String.fromCharCode(c.charCodeAt(0) + 1);
+        }
+        if (c >= "a" && c <= "z") {
+          return c === "z" ? "a" : String.fromCharCode(c.charCodeAt(0) + 1);
+        }
+        return c;
       }).join("");
     }
   </script>
