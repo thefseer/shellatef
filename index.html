@@ -66,7 +66,6 @@
     }
 
     textarea {
-      flex: 1;
       min-height: 140px;
       padding: 12px;
       font-size: 16px;
@@ -76,8 +75,28 @@
       resize: none;
     }
 
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    button {
+      flex: 1;
+      padding: 6px 8px;
+      font-size: 13px;
+      border: 1px solid #ccc;
+      background: #f9f9f9;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:active {
+      background: #eaeaea;
+    }
+
     .footer {
-      margin-top: 12px;
+      margin-top: 14px;
       font-size: 12px;
       color: #777;
       text-align: right;
@@ -87,11 +106,9 @@
       h1 {
         font-size: 26px;
       }
-
       .hero-img {
         max-height: 220px;
       }
-
       .boxes {
         flex-direction: column;
       }
@@ -107,14 +124,26 @@
       <img src="IMG_9532.JPEG" alt="shellatef image" class="hero-img">
 
       <div class="boxes">
+        <!-- Original -->
         <div class="box">
           <h3>Original Text</h3>
           <textarea id="originalText" placeholder="Type here..."></textarea>
+          <div class="actions">
+            <button onclick="copyText(originalText)">Copy</button>
+            <button onclick="pasteText(originalText)">Paste</button>
+            <button onclick="clearText()">Clear</button>
+          </div>
         </div>
 
+        <!-- Converted -->
         <div class="box">
           <h3>Converted Text</h3>
           <textarea id="convertedText" placeholder="Type here..."></textarea>
+          <div class="actions">
+            <button onclick="copyText(convertedText)">Copy</button>
+            <button onclick="pasteText(convertedText)">Paste</button>
+            <button onclick="clearText()">Clear</button>
+          </div>
         </div>
       </div>
 
@@ -123,22 +152,21 @@
   </div>
 
   <script>
-    const original = document.getElementById("originalText");
-    const converted = document.getElementById("convertedText");
-
+    const originalText = document.getElementById("originalText");
+    const convertedText = document.getElementById("convertedText");
     let active = null;
 
-    original.addEventListener("input", () => {
+    originalText.addEventListener("input", () => {
       if (active === "converted") return;
       active = "original";
-      converted.value = shiftBackward(original.value);
+      convertedText.value = shiftBackward(originalText.value);
       active = null;
     });
 
-    converted.addEventListener("input", () => {
+    convertedText.addEventListener("input", () => {
       if (active === "original") return;
       active = "converted";
-      original.value = shiftForward(converted.value);
+      originalText.value = shiftForward(convertedText.value);
       active = null;
     });
 
@@ -156,6 +184,21 @@
         if (c >= "a" && c <= "z") return c === "z" ? "a" : String.fromCharCode(c.charCodeAt(0) + 1);
         return c;
       }).join("");
+    }
+
+    function copyText(el) {
+      navigator.clipboard.writeText(el.value);
+    }
+
+    async function pasteText(el) {
+      const text = await navigator.clipboard.readText();
+      el.value = text;
+      el.dispatchEvent(new Event("input"));
+    }
+
+    function clearText() {
+      originalText.value = "";
+      convertedText.value = "";
     }
   </script>
 
